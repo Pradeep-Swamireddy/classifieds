@@ -2,6 +2,7 @@ package com.deloitte.classifieds.service;
 
 import com.deloitte.classifieds.controllers.models.Classified;
 import com.deloitte.classifieds.exceptions.ClassifiedNotFoundException;
+import com.deloitte.classifieds.external.RatingsClient;
 import com.deloitte.classifieds.repository.ClassifiedsRepository;
 import com.deloitte.classifieds.repository.models.ClassifiedDocument;
 import com.deloitte.classifieds.service.mappers.ClassifiedsMapper;
@@ -21,10 +22,12 @@ import static java.lang.String.format;
 public class ClassifiedsService {
     private final ClassifiedsRepository classifiedsRepository;
     private final ClassifiedsMapper classifiedsMapper;
+    private final RatingsClient ratingsClient;
 
-    public ClassifiedsService(final ClassifiedsRepository classifiedsRepository, final ClassifiedsMapper classifiedsMapper) {
+    public ClassifiedsService(final ClassifiedsRepository classifiedsRepository, final ClassifiedsMapper classifiedsMapper, final RatingsClient ratingsClient) {
         this.classifiedsRepository = classifiedsRepository;
         this.classifiedsMapper = classifiedsMapper;
+        this.ratingsClient = ratingsClient;
     }
 
     public Classified saveClassified(final Classified classified) {
@@ -34,7 +37,7 @@ public class ClassifiedsService {
     }
 
     public List<ClassifiedDocument> saveAllClassifieds(final List<Classified> classifiedsList) {
-        final List<ClassifiedDocument> classifiedDocuments = classifiedsList.stream().map(c -> classifiedsMapper.classifiedToClassifiedDocument(c)).toList();
+        final List<ClassifiedDocument> classifiedDocuments = classifiedsList.stream().map(classifiedsMapper::classifiedToClassifiedDocument).toList();
         return classifiedsRepository.saveAll(classifiedDocuments);
     }
 
@@ -44,7 +47,11 @@ public class ClassifiedsService {
             throw new ClassifiedNotFoundException(format("Classified with id: %s not found", id));
         }
         final ClassifiedDocument classifiedDocument = byId.get();
-        return classifiedsMapper.classifiedDocumentToClassified(classifiedDocument);
+        Map<String, String> aggregateRatingBySellerId = ratingsClient.getAggregateRatingBySellerId(classifiedDocument.getSellerId());
+
+        final Classified classified = classifiedsMapper.classifiedDocumentToClassified(classifiedDocument);
+        classified.setSellerRating(aggregateRatingBySellerId.get(classified.getSellerId()));
+        return classified;
     }
 
     public void deleteClassified(final String id) {
@@ -82,6 +89,6 @@ public class ClassifiedsService {
     }
 
     private List<Classified> convertDocumentsToDTOs(final List<ClassifiedDocument> allBySellerId) {
-        return allBySellerId.stream().map(d -> classifiedsMapper.classifiedDocumentToClassified(d)).toList();
+        return allBySellerId.stream().map(classifiedsMapper::classifiedDocumentToClassified).toList();
     }
 }

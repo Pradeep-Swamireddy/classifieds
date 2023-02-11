@@ -1,18 +1,13 @@
 package com.deloitte.classifieds;
 
-import com.deloitte.classifieds.controllers.models.Classified;
 import com.deloitte.classifieds.service.ClassifiedsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Stream;
-
+@EnableFeignClients
 @SpringBootApplication
 public class ClassifiedsApplication implements CommandLineRunner {
     @Autowired
@@ -21,7 +16,6 @@ public class ClassifiedsApplication implements CommandLineRunner {
     public static void main(String[] args) {
         SpringApplication.run(ClassifiedsApplication.class, args);
     }
-
 
     @Override
     public void run(final String... args) throws Exception {

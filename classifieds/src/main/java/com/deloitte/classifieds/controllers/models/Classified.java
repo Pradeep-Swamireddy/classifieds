@@ -23,4 +23,5 @@ public class Classified {
     private LocalDate purchaseDate;
     @NotNull
     private Double sellingPrice;
+    private String sellerRating;
 }
