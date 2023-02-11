@@ -7,6 +7,7 @@ import com.deloitte.classifieds.repository.models.ClassifiedDocument;
 import com.deloitte.classifieds.service.mappers.ClassifiedsMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -25,6 +26,11 @@ public class ClassifiedsService {
         final ClassifiedDocument classifiedDocument = classifiedsMapper.classifiedToClassifiedDocument(classified);
         final ClassifiedDocument savedClassifiedDocument = classifiedsRepository.save(classifiedDocument);
         return classifiedsMapper.classifiedDocumentToClassified(savedClassifiedDocument);
+    }
+
+    public List<ClassifiedDocument> saveAllClassifieds(final List<Classified> classifiedsList){
+        final List<ClassifiedDocument> classifiedDocuments = classifiedsList.stream().map(c -> classifiedsMapper.classifiedToClassifiedDocument(c)).toList();
+        return classifiedsRepository.saveAll(classifiedDocuments);
     }
 
     public Classified getClassifiedById(final String id) {
