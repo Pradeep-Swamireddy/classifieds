@@ -7,6 +7,7 @@ import com.deloitte.classifieds.repository.models.ClassifiedDocument;
 import com.deloitte.classifieds.service.mappers.ClassifiedsMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,15 +29,15 @@ public class ClassifiedsService {
         return classifiedsMapper.classifiedDocumentToClassified(savedClassifiedDocument);
     }
 
-    public List<ClassifiedDocument> saveAllClassifieds(final List<Classified> classifiedsList){
+    public List<ClassifiedDocument> saveAllClassifieds(final List<Classified> classifiedsList) {
         final List<ClassifiedDocument> classifiedDocuments = classifiedsList.stream().map(c -> classifiedsMapper.classifiedToClassifiedDocument(c)).toList();
         return classifiedsRepository.saveAll(classifiedDocuments);
     }
 
     public Classified getClassifiedById(final String id) {
         final Optional<ClassifiedDocument> byId = classifiedsRepository.findById(id);
-        if(byId.isEmpty()){
-            throw new ClassifiedNotFoundException(format("Classified with id: %s not found",id));
+        if (byId.isEmpty()) {
+            throw new ClassifiedNotFoundException(format("Classified with id: %s not found", id));
         }
         final ClassifiedDocument classifiedDocument = byId.get();
         return classifiedsMapper.classifiedDocumentToClassified(classifiedDocument);
@@ -44,5 +45,25 @@ public class ClassifiedsService {
 
     public void deleteClassified(final String id) {
         classifiedsRepository.deleteById(id);
+    }
+
+    public List<Classified> findAllBySellerId(final String sellerId) {
+        final List<ClassifiedDocument> allBySellerId = classifiedsRepository.findAllBySellerId(sellerId);
+        return convertDocumentsToDTOs(allBySellerId);
+    }
+
+    public List<Classified> findAllByCategory(final String category) {
+        final List<ClassifiedDocument> results = classifiedsRepository.findAllByCategory(category);
+        return convertDocumentsToDTOs(results);
+    }
+
+    private List<Classified> convertDocumentsToDTOs(final List<ClassifiedDocument> allBySellerId) {
+        return allBySellerId.stream().map(d -> classifiedsMapper.classifiedDocumentToClassified(d)).toList();
+    }
+
+    public List<Classified> findAllByCategoryAndFrom(final String category, final String from) {
+        LocalDate date = LocalDate.now().minusYears(Long.valueOf(from));
+        final List<ClassifiedDocument> allByCategoryAndPurchaseDateAfter = classifiedsRepository.findAllByCategoryAndPurchaseDateAfter(category, date);
+        return convertDocumentsToDTOs(allByCategoryAndPurchaseDateAfter);
     }
 }

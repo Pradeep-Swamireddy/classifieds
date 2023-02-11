@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.util.List;
 
 @RestController
 @Log4j2
@@ -51,5 +54,19 @@ public class ClassifiedsController {
     public Classified getClassifiedById(@PathVariable String id) {
         log.info("Getting classified with id: {}", id);
         return classifiedService.getClassifiedById(id);
+    }
+
+    @GetMapping("/classifieds")
+    public List<Classified> getClassifiedsByFilters(@RequestParam(required = false) String sellerId,@RequestParam(required = false) String category,@RequestParam(required = false) String from){
+        log.info("Getting classified with seller: {},category: {}, from: {}", sellerId,category,from);
+        if(sellerId!=null){
+            return classifiedService.findAllBySellerId(sellerId);
+        }else if(category!=null&&from!=null){
+            return classifiedService.findAllByCategoryAndFrom(category,from);
+        }else if(category!=null){
+            return classifiedService.findAllByCategory(category);
+        }else{
+            throw new RuntimeException("Invalid filters");
+        }
     }
 }
