@@ -10,8 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ClassifiedsRepository extends MongoRepository<ClassifiedDocument, String>, PagingAndSortingRepository<ClassifiedDocument, String> {
-    List<ClassifiedDocument> findAllByCategory(String category);
-    List<ClassifiedDocument> findAllByCategoryAndPurchaseDateAfter(String category, LocalDate date);
-    List<ClassifiedDocument> findAllBySellerId(String sellerId);
+    Page<ClassifiedDocument> findAllByCategory(String category, Pageable pageable);
+    Page<ClassifiedDocument> findAllByCategoryAndPurchaseDateAfter(String category, LocalDate date, Pageable pageable);
+    Page<ClassifiedDocument> findAllBySellerId(String sellerId, Pageable pageable);
     Page<ClassifiedDocument> findAll(Pageable pageable);
 }

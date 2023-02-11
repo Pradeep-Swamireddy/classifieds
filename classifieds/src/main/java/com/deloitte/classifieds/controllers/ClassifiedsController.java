@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -60,23 +59,17 @@ public class ClassifiedsController {
     }
 
     @GetMapping("/classifieds")
-    public Map<String, Object> getClassifiedsByPage(@RequestParam(defaultValue = "0") int page,
-                                                    @RequestParam(defaultValue = "3") int size) {
+    public Map<String, Object> getClassifiedsByFilters(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size, @RequestParam(required = false) String sellerId, @RequestParam(required = false) String category, @RequestParam(required = false) String from) {
+        log.info("Getting classified with seller: {},category: {}, from: {}, page: {}, size: {}", sellerId, category, from, page, size);
         Pageable paging = PageRequest.of(page, size);
-        return classifiedService.getClassifiedsByPage(paging);
-    }
-
-   /* @GetMapping("/classifieds")
-    public List<Classified> getClassifiedsByFilters(@RequestParam(required = false) String sellerId, @RequestParam(required = false) String category, @RequestParam(required = false) String from) {
-        log.info("Getting classified with seller: {},category: {}, from: {}", sellerId, category, from);
         if (sellerId != null) {
-            return classifiedService.findAllBySellerId(sellerId);
+            return classifiedService.findAllBySellerId(sellerId, paging);
         } else if (category != null && from != null) {
-            return classifiedService.findAllByCategoryAndFrom(category, from);
+            return classifiedService.findAllByCategoryAndFrom(category, from, paging);
         } else if (category != null) {
-            return classifiedService.findAllByCategory(category);
+            return classifiedService.findAllByCategory(category, paging);
         } else {
-            throw new RuntimeException("Invalid filters");
+            return classifiedService.getClassifiedsByPage(paging);
         }
-    }*/
+    }
 }

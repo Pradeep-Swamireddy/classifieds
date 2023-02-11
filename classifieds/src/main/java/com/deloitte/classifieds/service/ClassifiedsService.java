@@ -51,29 +51,33 @@ public class ClassifiedsService {
         classifiedsRepository.deleteById(id);
     }
 
-    public List<Classified> findAllBySellerId(final String sellerId) {
-        final List<ClassifiedDocument> allBySellerId = classifiedsRepository.findAllBySellerId(sellerId);
-        return convertDocumentsToDTOs(allBySellerId);
+    public Map<String, Object> findAllBySellerId(final String sellerId, final Pageable paging) {
+        final Page<ClassifiedDocument> allBySellerId = classifiedsRepository.findAllBySellerId(sellerId, paging);
+        return getPageMapFromDocuments(allBySellerId);
     }
 
-    public List<Classified> findAllByCategory(final String category) {
-        final List<ClassifiedDocument> results = classifiedsRepository.findAllByCategory(category);
-        return convertDocumentsToDTOs(results);
+    public Map<String, Object> findAllByCategory(final String category, final Pageable paging) {
+        final Page<ClassifiedDocument> results = classifiedsRepository.findAllByCategory(category, paging);
+        return getPageMapFromDocuments(results);
     }
 
-    public List<Classified> findAllByCategoryAndFrom(final String category, final String from) {
-        LocalDate date = LocalDate.now().minusYears(Long.valueOf(from));
-        final List<ClassifiedDocument> allByCategoryAndPurchaseDateAfter = classifiedsRepository.findAllByCategoryAndPurchaseDateAfter(category, date);
-        return convertDocumentsToDTOs(allByCategoryAndPurchaseDateAfter);
+    public Map<String, Object> findAllByCategoryAndFrom(final String category, final String from, final Pageable paging) {
+        LocalDate date = LocalDate.now().minusYears(Long.parseLong(from));
+        final Page<ClassifiedDocument> allByCategoryAndPurchaseDateAfter = classifiedsRepository.findAllByCategoryAndPurchaseDateAfter(category, date, paging);
+        return getPageMapFromDocuments(allByCategoryAndPurchaseDateAfter);
     }
 
     public Map<String, Object> getClassifiedsByPage(final Pageable paging) {
         final Page<ClassifiedDocument> classifiedDocuments = classifiedsRepository.findAll(paging);
-        Map<String,Object> map = new HashMap<>();
+        return getPageMapFromDocuments(classifiedDocuments);
+    }
+
+    private Map<String, Object> getPageMapFromDocuments(final Page<ClassifiedDocument> classifiedDocuments) {
+        Map<String, Object> map = new HashMap<>();
         map.put("classifieds", convertDocumentsToDTOs(classifiedDocuments.getContent()));
-        map.put( "currentPage",classifiedDocuments.getNumber());
-        map.put( "totalItems",classifiedDocuments.getTotalElements());
-        map.put( "totalPages",classifiedDocuments.getTotalPages());
+        map.put("currentPage", classifiedDocuments.getNumber());
+        map.put("totalItems", classifiedDocuments.getTotalElements());
+        map.put("totalPages", classifiedDocuments.getTotalPages());
         return map;
     }
 
