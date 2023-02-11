@@ -5,10 +5,14 @@ import com.deloitte.classifieds.exceptions.ClassifiedNotFoundException;
 import com.deloitte.classifieds.repository.ClassifiedsRepository;
 import com.deloitte.classifieds.repository.models.ClassifiedDocument;
 import com.deloitte.classifieds.service.mappers.ClassifiedsMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -57,13 +61,23 @@ public class ClassifiedsService {
         return convertDocumentsToDTOs(results);
     }
 
-    private List<Classified> convertDocumentsToDTOs(final List<ClassifiedDocument> allBySellerId) {
-        return allBySellerId.stream().map(d -> classifiedsMapper.classifiedDocumentToClassified(d)).toList();
-    }
-
     public List<Classified> findAllByCategoryAndFrom(final String category, final String from) {
         LocalDate date = LocalDate.now().minusYears(Long.valueOf(from));
         final List<ClassifiedDocument> allByCategoryAndPurchaseDateAfter = classifiedsRepository.findAllByCategoryAndPurchaseDateAfter(category, date);
         return convertDocumentsToDTOs(allByCategoryAndPurchaseDateAfter);
+    }
+
+    public Map<String, Object> getClassifiedsByPage(final Pageable paging) {
+        final Page<ClassifiedDocument> classifiedDocuments = classifiedsRepository.findAll(paging);
+        Map<String,Object> map = new HashMap<>();
+        map.put("classifieds", convertDocumentsToDTOs(classifiedDocuments.getContent()));
+        map.put( "currentPage",classifiedDocuments.getNumber());
+        map.put( "totalItems",classifiedDocuments.getTotalElements());
+        map.put( "totalPages",classifiedDocuments.getTotalPages());
+        return map;
+    }
+
+    private List<Classified> convertDocumentsToDTOs(final List<ClassifiedDocument> allBySellerId) {
+        return allBySellerId.stream().map(d -> classifiedsMapper.classifiedDocumentToClassified(d)).toList();
     }
 }

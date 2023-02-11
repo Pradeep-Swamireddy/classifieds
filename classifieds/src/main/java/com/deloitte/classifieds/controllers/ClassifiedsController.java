@@ -4,6 +4,8 @@ import com.deloitte.classifieds.controllers.models.Classified;
 import com.deloitte.classifieds.service.ClassifiedsService;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Log4j2
@@ -57,16 +60,23 @@ public class ClassifiedsController {
     }
 
     @GetMapping("/classifieds")
-    public List<Classified> getClassifiedsByFilters(@RequestParam(required = false) String sellerId,@RequestParam(required = false) String category,@RequestParam(required = false) String from){
-        log.info("Getting classified with seller: {},category: {}, from: {}", sellerId,category,from);
-        if(sellerId!=null){
+    public Map<String, Object> getClassifiedsByPage(@RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "3") int size) {
+        Pageable paging = PageRequest.of(page, size);
+        return classifiedService.getClassifiedsByPage(paging);
+    }
+
+   /* @GetMapping("/classifieds")
+    public List<Classified> getClassifiedsByFilters(@RequestParam(required = false) String sellerId, @RequestParam(required = false) String category, @RequestParam(required = false) String from) {
+        log.info("Getting classified with seller: {},category: {}, from: {}", sellerId, category, from);
+        if (sellerId != null) {
             return classifiedService.findAllBySellerId(sellerId);
-        }else if(category!=null&&from!=null){
-            return classifiedService.findAllByCategoryAndFrom(category,from);
-        }else if(category!=null){
+        } else if (category != null && from != null) {
+            return classifiedService.findAllByCategoryAndFrom(category, from);
+        } else if (category != null) {
             return classifiedService.findAllByCategory(category);
-        }else{
+        } else {
             throw new RuntimeException("Invalid filters");
         }
-    }
+    }*/
 }
