@@ -25,15 +25,15 @@ public class ClassifiedsApplication implements CommandLineRunner {
 
     @Override
     public void run(final String... args) throws Exception {
-       /* List<String> users = List.of("Pradeep", "Souji", "Bhanu", "Vinodh", "Swathi");
-        List<String> names = List.of("Car", "Phone", "Exercise Bike", "Television", "Table");
+       /*List<String> users = List.of("Pradeep", "Souji", "Bhanu", "Vinodh");
+        List<String> names = List.of("Car", "Phone", "Bike", "Television", "Table", "Laptop", "Desktop", "MacBook", "IPad");
         final List<Classified> classifieds = Stream.generate(new Random()::nextInt)
-                .limit(55).map(i -> {
+                .limit(105).map(i -> {
                     int absI = Math.abs(i);
                     String sellerId = users.get(absI % users.size());
                     String category = names.get(absI % names.size());
                     String name = category + " " + absI;
-                    LocalDate purchaseDate = LocalDate.now().minus(absI, ChronoUnit.DAYS);
+                    LocalDate purchaseDate = LocalDate.now().minus(absI%11, ChronoUnit.YEARS);
                     Double sellingPrice = Double.valueOf(absI);
                     return new Classified(null, sellerId, name, category, purchaseDate, sellingPrice);
                 }).toList();
