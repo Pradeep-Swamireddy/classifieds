@@ -76,8 +76,14 @@ public class ClassifiedsService {
 
     public Map<String, Object> findAllByCategoryAndFrom(final String category, final String from, final Pageable paging) {
         LocalDate date = LocalDate.now().minusYears(Long.parseLong(from));
-        final Page<ClassifiedDocument> allByCategoryAndPurchaseDateAfter = classifiedsRepository.findAllByCategoryAndPurchaseDateAfter(category, date, paging);
-        return getPageMapFromDocuments(allByCategoryAndPurchaseDateAfter);
+        final Page<ClassifiedDocument> results = classifiedsRepository.findAllByCategoryAndPurchaseDateAfter(category, date, paging);
+        return getPageMapFromDocuments(results);
+    }
+
+    public Map<String, Object> findAllBySellerIdAndCategoryAndFrom(final String sellerId, final String category, final String from, final Pageable paging) {
+        LocalDate date = LocalDate.now().minusYears(Long.parseLong(from));
+        final Page<ClassifiedDocument> results = classifiedsRepository.findAllBySellerIdAndCategoryAndPurchaseDateAfter(sellerId,category, date, paging);
+        return getPageMapFromDocuments(results);
     }
 
     public Map<String, Object> getClassifiedsByPage(final Pageable paging) {

@@ -66,7 +66,9 @@ public class ClassifiedsController {
                                                        @RequestParam(required = false) String from) {
         log.info("Getting classified with seller: {},category: {}, from: {}, page: {}, size: {}", sellerId, category, from, page, size);
         Pageable paging = PageRequest.of(page, size);
-        if (sellerId != null) {
+        if (sellerId != null && category != null && from != null) {
+            return classifiedService.findAllBySellerIdAndCategoryAndFrom(sellerId, category, from, paging);
+        } else if (sellerId != null) {
             return classifiedService.findAllBySellerId(sellerId, paging);
         } else if (category != null && from != null) {
             return classifiedService.findAllByCategoryAndFrom(category, from, paging);
