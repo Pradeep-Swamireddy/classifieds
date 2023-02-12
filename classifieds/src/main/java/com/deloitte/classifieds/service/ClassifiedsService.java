@@ -50,7 +50,7 @@ public class ClassifiedsService {
         Map<String, String> aggregateRatingBySellerId = ratingsClient.getAggregateRatingBySellerId(classifiedDocument.getSellerId());
 
         final Classified classified = classifiedsMapper.classifiedDocumentToClassified(classifiedDocument);
-        classified.setSellerRating(aggregateRatingBySellerId.get(classified.getSellerId()));
+        classified.setSellerRating(aggregateRatingBySellerId.get(aggregateRatingBySellerId.keySet().stream().findFirst().get()));
         return classified;
     }
 
