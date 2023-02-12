@@ -20,6 +20,7 @@ public class Classified extends RepresentationModel<Classified> {
     private String sellerId;
     @NotEmpty
     private String name;
+    @NotEmpty
     private String category;
     private LocalDate purchaseDate;
     @NotNull
