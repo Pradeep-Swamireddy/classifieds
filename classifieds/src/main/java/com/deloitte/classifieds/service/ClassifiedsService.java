@@ -1,5 +1,6 @@
 package com.deloitte.classifieds.service;
 
+import com.deloitte.classifieds.controllers.ClassifiedsController;
 import com.deloitte.classifieds.controllers.models.Classified;
 import com.deloitte.classifieds.exceptions.ClassifiedNotFoundException;
 import com.deloitte.classifieds.external.RatingsClient;
@@ -8,6 +9,7 @@ import com.deloitte.classifieds.repository.models.ClassifiedDocument;
 import com.deloitte.classifieds.service.mappers.ClassifiedsMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,6 +19,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class ClassifiedsService {
@@ -51,6 +55,8 @@ public class ClassifiedsService {
 
         final Classified classified = classifiedsMapper.classifiedDocumentToClassified(classifiedDocument);
         classified.setSellerRating(aggregateRatingBySellerId.get(aggregateRatingBySellerId.keySet().stream().findFirst().get()));
+        classified.add(linkTo(methodOn(ClassifiedsController.class).getClassifiedById(classified.getItemId())).withSelfRel());
+        classified.add(linkTo(methodOn(ClassifiedsController.class).getClassifiedsByFilters(0, 3, classified.getSellerId(), classified.getCategory(), "5")).withRel(IanaLinkRelations.COLLECTION));
         return classified;
     }
 
@@ -89,6 +95,7 @@ public class ClassifiedsService {
     }
 
     private List<Classified> convertDocumentsToDTOs(final List<ClassifiedDocument> allBySellerId) {
-        return allBySellerId.stream().map(classifiedsMapper::classifiedDocumentToClassified).toList();
+        return allBySellerId.stream().map(classifiedsMapper::classifiedDocumentToClassified)
+                .map(c -> c.add(linkTo(methodOn(ClassifiedsController.class).getClassifiedById(c.getItemId())).withSelfRel())).toList();
     }
 }

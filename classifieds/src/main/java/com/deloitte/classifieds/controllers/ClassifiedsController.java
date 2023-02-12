@@ -59,7 +59,11 @@ public class ClassifiedsController {
     }
 
     @GetMapping("/classifieds")
-    public Map<String, Object> getClassifiedsByFilters(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size, @RequestParam(required = false) String sellerId, @RequestParam(required = false) String category, @RequestParam(required = false) String from) {
+    public Map<String, Object> getClassifiedsByFilters(@RequestParam(defaultValue = "0", required = false) int page,
+                                                       @RequestParam(defaultValue = "3", required = false) int size,
+                                                       @RequestParam(required = false) String sellerId,
+                                                       @RequestParam(required = false) String category,
+                                                       @RequestParam(required = false) String from) {
         log.info("Getting classified with seller: {},category: {}, from: {}, page: {}, size: {}", sellerId, category, from, page, size);
         Pageable paging = PageRequest.of(page, size);
         if (sellerId != null) {
