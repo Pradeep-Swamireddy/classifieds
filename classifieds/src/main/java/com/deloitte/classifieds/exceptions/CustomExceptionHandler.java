@@ -21,7 +21,7 @@ import static java.lang.String.format;
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
-    // Exception method for Id Not Found with Status code 404.
+    // Exception method when Id Not Found with Status code 404.
     @ExceptionHandler(ClassifiedNotFoundException.class)
     public final ResponseEntity<Object> handleUserNotFoundException(ClassifiedNotFoundException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
